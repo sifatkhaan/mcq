@@ -1,4 +1,4 @@
-import { getAccessToken } from "./auth/auth-storage";
+import { getAccessToken } from "../auth/auth-storage";
 import { apiClient } from "./client";
 
 export async function authenticatedApiClient<T>(

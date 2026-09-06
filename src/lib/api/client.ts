@@ -9,7 +9,6 @@ export async function apiClient<T>(
   options: ApiOptions = {},
 ): Promise<T> {
   const { token, ...fetchOptions } = options;
-
   const headers = new Headers(fetchOptions.headers);
 
   if (fetchOptions.body && !headers.has("Content-Type")) {

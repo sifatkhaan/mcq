@@ -9,10 +9,14 @@ export interface User {
   id: number;
   email: string;
   name?: string;
-  roles?: UserRole[];
+  role?: UserRole[];
 }
 
 export interface LoginResponse {
   accessToken: string;
+  user: User;
+}
+export interface ProfileResponse {
+  message: string;
   user: User;
 }

@@ -1,8 +1,8 @@
 "use client";
 import { FormEvent, useState } from "react";
-import { login } from "@/lib/api/auth";
+import { getProfile, login } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
-import { saveAuth } from "@/lib/api/auth/auth-storage";
+import { saveAuth } from "@/lib/auth/auth-storage";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,8 +17,10 @@ export default function LoginPage() {
 
     try {
       const result = await login(email, password);
-
       saveAuth(result.accessToken, result.user);
+      const profile = await getProfile();
+      saveAuth(result.accessToken, profile.user);
+
       router.push("/");
     } catch (error) {
       setError(error instanceof Error ? error.message : "Login failed");
