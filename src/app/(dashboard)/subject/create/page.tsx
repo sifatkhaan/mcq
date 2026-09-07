@@ -26,9 +26,7 @@ export default function CreateSubjectPage() {
     async function loadOrganizations() {
       try {
         setOrganizationLoading(true);
-
         const result = await getOrganizations();
-
         setOrganizations(result);
       } catch (error) {
         setError(
