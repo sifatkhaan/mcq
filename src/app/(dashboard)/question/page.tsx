@@ -179,25 +179,17 @@ export default function QuestionPage() {
       try {
         const result = await getQuestions({
           page,
-
           pageSize,
-
           search,
-
           subjectId: subjectId ? Number(subjectId) : undefined,
-
           chapterId: chapterId ? Number(chapterId) : undefined,
-
           topicId: topicId ? Number(topicId) : undefined,
-
           difficulty: difficulty || undefined,
         });
 
         if (!cancelled) {
           setQuestions(result.data);
-
           setTotal(result.pagination.total);
-
           setTotalPages(result.pagination.total_pages);
         }
       } catch (error) {

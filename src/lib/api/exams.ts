@@ -128,6 +128,42 @@ export interface UpdateExamPayload {
   end_at: string;
 }
 
+export interface ExamQuestion {
+  exam_question_id: number;
+  exam_id: number;
+  question_version_id: number;
+  question_order: number;
+  marks: number;
+  negative_marks: number;
+  question_id: number;
+  version_no: number;
+  question_text: string;
+  difficulty: string;
+  subject_name: string;
+}
+export interface AddExamQuestionPayload {
+  question_version_id: number;
+  question_order: number;
+  marks: number;
+  negative_marks: number;
+}
+
+export interface ExamAssignment {
+  assignment_id: number;
+  exam_id: number;
+  student_id: number;
+  status: string;
+  assigned_at: string;
+  completed_at: string | null;
+  student_username: string;
+  student_email: string;
+}
+export interface AvailableStudent {
+  id: number;
+  username: string;
+  email: string;
+}
+
 // ==========================================
 // GET ALL EXAMS
 // ==========================================
@@ -195,4 +231,60 @@ export async function deleteExam(id: number) {
   return authenticatedApiClient(`/exams/${id}`, {
     method: "DELETE",
   });
+}
+
+// ==========================================
+// GET EXAM QUESTIONS
+// ==========================================
+export async function getExamQuestions(examId: number) {
+  return authenticatedApiClient<ExamQuestion[]>(`/exams/${examId}/questions`);
+}
+// ==========================================
+// ADD QUESTION TO EXAM
+// ==========================================
+export async function addExamQuestion(
+  examId: number,
+  payload: AddExamQuestionPayload,
+) {
+  return authenticatedApiClient<ExamQuestion>(`/exams/${examId}/questions`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+// ==========================================
+// DELETE QUESTION FROM EXAM
+// ==========================================
+
+export async function deleteExamQuestion(
+  examId: number,
+  examQuestionId: number,
+) {
+  return authenticatedApiClient(
+    `/exams/${examId}/questions/${examQuestionId}`,
+    {
+      method: "DELETE",
+    },
+  );
+}
+// ==========================================
+//  EXAM ASSIGNMENTS
+// ==========================================
+export async function getExamAssignments(examId: number) {
+  return authenticatedApiClient<ExamAssignment[]>(
+    `/exams/${examId}/assignments`,
+  );
+}
+
+export async function getAvailableStudents(examId: number) {
+  return authenticatedApiClient<AvailableStudent[]>(
+    `/exams/${examId}/available-students`,
+  );
+}
+
+export async function assignStudentToExam(examId: number, studentId: number) {
+  return authenticatedApiClient<ExamAssignment>(
+    `/exams/${examId}/assignments`,
+    { method: "POST", body: JSON.stringify({ student_id: studentId }) },
+  );
 }

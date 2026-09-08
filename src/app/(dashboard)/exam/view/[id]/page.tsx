@@ -112,7 +112,13 @@ export default function ViewExamPage() {
         {exam.status === "DRAFT" && (
           <Button href={`/exam/edit/${exam.id}`}>Edit</Button>
         )}
+        <Button href={`/exam/questions/${exam.id}`} variant="outline">
+          Questions
+        </Button>
       </div>
+      <Button href={`/exam/assignments/${exam.id}`} variant="outline">
+        Assignments
+      </Button>
 
       {/* Status */}
 
