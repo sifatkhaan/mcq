@@ -16,13 +16,8 @@ const items = [
   },
   {
     label: "Results",
-    href: "/student/results",
+    href: "/student/history",
     icon: "📊",
-  },
-  {
-    label: "Profile",
-    href: "/student/profile",
-    icon: "👤",
   },
 ];
 

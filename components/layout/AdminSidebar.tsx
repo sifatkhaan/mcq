@@ -2,11 +2,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getStoredUser } from "@/lib/auth/auth-storage";
+import { getUserRoles } from "@/lib/auth/route-access";
 import { navigationItems } from "./navigation";
 export default function AdminSidebar() {
   const pathname = usePathname();
   const user = getStoredUser();
-  const roles = user?.roles ?? [];
+  const roles = getUserRoles(user);
   const visibleItems = navigationItems.filter((item) =>
     item.roles.some((role) => roles.includes(role)),
   );

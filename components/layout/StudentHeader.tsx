@@ -1,6 +1,7 @@
 "use client";
 import { clearAuth, getStoredUser } from "@/lib/auth/auth-storage";
 import { useRouter } from "next/navigation";
+import NotificationBell from "../notifications/NotificationBell";
 
 export default function StudentHeader() {
   const router = useRouter();
@@ -18,13 +19,7 @@ export default function StudentHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
-            aria-label="Notifications"
-          >
-            🔔
-          </button>
+          <NotificationBell />
           <button
             type="button"
             onClick={handleLogout}

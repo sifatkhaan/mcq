@@ -9,7 +9,8 @@ export interface User {
   id: number;
   email: string;
   name?: string;
-  role?: UserRole[];
+  role?: UserRole | UserRole[];
+  roles?: UserRole[];
 }
 
 export interface LoginResponse {

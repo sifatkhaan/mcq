@@ -3,6 +3,7 @@ import { FormEvent, useState } from "react";
 import { getProfile, login } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
 import { saveAuth } from "@/lib/auth/auth-storage";
+import { getDefaultRouteForUser } from "@/lib/auth/route-access";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,7 +22,7 @@ export default function LoginPage() {
       const profile = await getProfile();
       saveAuth(result.accessToken, profile.user);
 
-      router.push("/");
+      router.push(getDefaultRouteForUser(profile.user));
     } catch (error) {
       setError(error instanceof Error ? error.message : "Login failed");
     } finally {

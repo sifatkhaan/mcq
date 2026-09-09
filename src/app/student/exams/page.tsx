@@ -16,15 +16,11 @@ export default function StudentExamsPage() {
 
   useEffect(() => {
     let cancelled = false;
-
     async function loadExams() {
       try {
         setLoading(true);
-
         setError("");
-
         const result = await getAvailableExams();
-
         if (!cancelled) {
           setExams(result);
         }
@@ -57,13 +53,9 @@ export default function StudentExamsPage() {
   async function handleStartExam(examId: number) {
     try {
       setStartingExamId(examId);
-
       setError("");
-
       const result = await startExam(examId);
-
       const attemptId = result.attempt.id;
-
       router.push(`/student/attempt/${attemptId}`);
     } catch (error) {
       setError(

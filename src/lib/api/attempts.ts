@@ -69,7 +69,7 @@ export interface SaveAnswerResponse {
 export interface SubmitAttemptResponse {
   message: string;
   attempt: {
-    id: number;
+    attempt_id: number;
     exam_id: number;
     attempt_no: number;
     submitted_at: string;

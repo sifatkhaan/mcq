@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   getAttemptQuestions,
@@ -35,6 +35,7 @@ export default function StudentAttemptPage() {
   const [savingQuestionId, setSavingQuestionId] = useState<number | null>(null);
   const [error, setError] = useState("");
   const autoSubmitChecking = useRef(false);
+  const attemptExpiresAt = attempt?.expires_at;
   useEffect(() => {
     if (!attemptId) {
       return;
@@ -117,8 +118,8 @@ export default function StudentAttemptPage() {
     try {
       setSubmitting(true);
       setError("");
-      const result = await submitAttempt(attemptId);
-      router.push(`/student/result/${result.attempt.id}`);
+      await submitAttempt(attemptId);
+      router.replace(`/student/result/${attemptId}`);
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Failed to submit exam.",
@@ -128,7 +129,7 @@ export default function StudentAttemptPage() {
     }
   }
 
-  async function waitForAutoSubmit() {
+  const waitForAutoSubmit = useCallback(async () => {
     const maxWaitTime = 90 * 1000; // 90 seconds
     const pollingInterval = 2000; // Check every 2 seconds
 
@@ -169,24 +170,21 @@ export default function StudentAttemptPage() {
     }
 
     await checkSubmission();
-  }
+  }, [attemptId, router]);
 
   useEffect(() => {
-    if (!attempt?.expires_at) {
+    if (!attemptExpiresAt) {
       return;
     }
 
-    let timer: number | undefined;
+    const expiresAt = new Date(attemptExpiresAt).getTime();
 
     function updateTimer() {
-      const expiresAt = new Date(attempt!.expires_at).getTime();
       const now = Date.now();
       const remaining = Math.max(0, Math.ceil((expiresAt - now) / 1000));
       setRemainingSeconds(remaining);
       if (remaining <= 0) {
-        if (timer) {
-          window.clearInterval(timer);
-        }
+        window.clearInterval(timer);
 
         if (!autoSubmitChecking.current) {
           autoSubmitChecking.current = true;
@@ -194,14 +192,13 @@ export default function StudentAttemptPage() {
         }
       }
     }
+
+    const timer = window.setInterval(updateTimer, 1000);
     updateTimer();
-    timer = window.setInterval(updateTimer, 1000);
     return () => {
-      if (timer) {
-        window.clearInterval(timer);
-      }
+      window.clearInterval(timer);
     };
-  }, [attempt?.expires_at]);
+  }, [attemptExpiresAt, waitForAutoSubmit]);
 
   // =========================================================
   // LOADING
@@ -212,11 +209,8 @@ export default function StudentAttemptPage() {
       <div className="mx-auto w-full max-w-4xl">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-64 rounded bg-gray-200" />
-
           <div className="h-20 rounded-2xl bg-gray-100" />
-
           <div className="h-32 rounded-2xl bg-gray-100" />
-
           <div className="h-32 rounded-2xl bg-gray-100" />
         </div>
       </div>

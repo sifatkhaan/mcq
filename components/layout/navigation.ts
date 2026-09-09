@@ -8,32 +8,32 @@ export interface NavigationItem {
 export const navigationItems: NavigationItem[] = [
   {
     label: "Dashboard",
-    href: "/dashboard",
+    href: "/",
     roles: ["SUPER_ADMIN", "ADMIN", "EXAMINER", "TEACHER"],
   },
   {
     label: "Questions",
-    href: "/questions",
+    href: "/question",
     roles: ["SUPER_ADMIN", "ADMIN", "EXAMINER", "TEACHER"],
   },
   {
     label: "Exams",
-    href: "/exams",
+    href: "/exam",
     roles: ["SUPER_ADMIN", "ADMIN", "EXAMINER", "TEACHER"],
   },
   {
     label: "Subjects",
-    href: "/subjects",
+    href: "/subject",
     roles: ["SUPER_ADMIN", "ADMIN", "EXAMINER", "TEACHER"],
   },
   {
     label: "Students",
-    href: "/students",
+    href: "/admin/students",
     roles: ["SUPER_ADMIN", "ADMIN", "EXAMINER", "TEACHER"],
   },
   {
     label: "Reports",
-    href: "/reports",
+    href: "/admin/reports",
     roles: ["SUPER_ADMIN", "ADMIN", "EXAMINER", "TEACHER"],
   },
   {
