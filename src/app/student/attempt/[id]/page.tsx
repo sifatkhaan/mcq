@@ -293,9 +293,7 @@ export default function StudentAttemptPage() {
       <div className="mt-5 space-y-4">
         {questions.map((question, index) => {
           const selected = question.selected_option_id;
-
           const saving = savingQuestionId === question.exam_question_id;
-
           return (
             <div
               key={question.exam_question_id}

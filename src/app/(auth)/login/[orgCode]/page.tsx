@@ -1,26 +1,42 @@
 "use client";
+
 import { FormEvent, useState } from "react";
-import { getProfile, login } from "@/lib/api/auth";
-import { useRouter } from "next/navigation";
+import { getProfile, loginByOrganization } from "@/lib/api/auth";
+import { useParams, useRouter } from "next/navigation";
 import { saveAuth } from "@/lib/auth/auth-storage";
 import { getDefaultRouteForUser } from "@/lib/auth/route-access";
+
 export default function LoginPage() {
+  const params = useParams<{ orgCode: string }>();
+  const router = useRouter();
+
+  const organizationCode = params?.orgCode;
+  console.log(organizationCode, "org code");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const router = useRouter();
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const result = await login(email, password);
-      saveAuth(result.accessToken, result.user);
+      const result = await loginByOrganization(
+        organizationCode,
+        email,
+        password,
+      );
+
+      saveAuth(result.accessToken, result.user, organizationCode);
       const profile = await getProfile();
-      saveAuth(result.accessToken, profile.user);
+      // saveAuth(result.accessToken, {
+      //   ...profile.user,
+      //   organization_code: profile.user.organization_code ?? organizationCode,
+      // });
+      saveAuth(result.accessToken, profile.user, organizationCode);
 
       router.push(getDefaultRouteForUser(profile.user));
     } catch (error) {
@@ -62,13 +78,7 @@ export default function LoginPage() {
                 placeholder="Enter your email"
                 autoComplete="email"
                 required
-                className="
-                  w-full rounded-lg border border-gray-300
-                  px-3 py-3 text-sm outline-none
-                  transition
-                  focus:border-gray-500
-                  focus:ring-2 focus:ring-gray-200
-                "
+                className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
               />
             </div>
 
@@ -88,13 +98,7 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 required
-                className="
-                  w-full rounded-lg border border-gray-300
-                  px-3 py-3 text-sm outline-none
-                  transition
-                  focus:border-gray-500
-                  focus:ring-2 focus:ring-gray-200
-                "
+                className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
               />
             </div>
 
@@ -107,14 +111,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="
-                w-full rounded-lg bg-black
-                px-4 py-3 text-sm font-medium
-                text-white transition
-                hover:bg-gray-800
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-              "
+              className="w-full rounded-lg bg-black px-4 py-3 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>

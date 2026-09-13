@@ -1,25 +1,19 @@
 import type { User, UserRole } from "@/types/auth";
-
 export const LOGIN_ROUTE = "/login";
 export const ADMIN_HOME_ROUTE = "/";
 export const STUDENT_HOME_ROUTE = "/student";
-
 export const ADMIN_ROLES: UserRole[] = [
   "SUPER_ADMIN",
   "ADMIN",
   "EXAMINER",
   "TEACHER",
 ];
-
 export const STUDENT_ROLES: UserRole[] = ["STUDENT"];
-
 export type ProtectedArea = "admin" | "student";
-
 export function getUserRoles(user: User | null): UserRole[] {
   if (!user) {
     return [];
   }
-
   if (Array.isArray(user.roles)) {
     return user.roles;
   }
@@ -51,4 +45,12 @@ export function canAccessArea(user: User | null, area: ProtectedArea) {
 
 export function getDefaultRouteForUser(user: User | null) {
   return isStudentUser(user) ? STUDENT_HOME_ROUTE : ADMIN_HOME_ROUTE;
+}
+
+export function getLoginRoute(organizationCode?: string | null) {
+  if (organizationCode) {
+    return `/login/${encodeURIComponent(organizationCode)}`;
+  }
+
+  return LOGIN_ROUTE;
 }

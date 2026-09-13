@@ -4,7 +4,6 @@ export interface NavigationItem {
   href: string;
   roles: UserRole[];
 }
-
 export const navigationItems: NavigationItem[] = [
   {
     label: "Dashboard",
@@ -39,6 +38,11 @@ export const navigationItems: NavigationItem[] = [
   {
     label: "Notifications",
     href: "/notifications",
+    roles: ["SUPER_ADMIN", "ADMIN", "EXAMINER", "TEACHER"],
+  },
+  {
+    label: "Audit Logs",
+    href: "/audit-logs",
     roles: ["SUPER_ADMIN", "ADMIN", "EXAMINER", "TEACHER"],
   },
 ];

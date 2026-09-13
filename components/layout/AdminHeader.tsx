@@ -1,5 +1,9 @@
 "use client";
-import { clearAuth, getStoredUser } from "@/lib/auth/auth-storage";
+import {
+  clearAuth,
+  getStoredOrganizationCode,
+  getStoredUser,
+} from "@/lib/auth/auth-storage";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import MobileSidebar from "./MobileSidebar";
@@ -8,7 +12,14 @@ export default function AdminHeader() {
   const router = useRouter();
   const user = getStoredUser();
   function handleLogout() {
+    console.log("handle execuete here");
+    const organizationCode = getStoredOrganizationCode();
     clearAuth();
+    if (organizationCode) {
+      console.log(organizationCode, "code");
+      router.replace(`/login/${encodeURIComponent(organizationCode)}`);
+      return;
+    }
     router.replace("/login");
   }
 

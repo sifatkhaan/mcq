@@ -6,13 +6,14 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   getAuthSnapshot,
   getServerAuthSnapshot,
+  getStoredOrganizationCode,
   parseAuthSnapshot,
   subscribeToAuthChanges,
 } from "@/lib/auth/auth-storage";
 import {
   canAccessArea,
   getDefaultRouteForUser,
-  LOGIN_ROUTE,
+  getLoginRoute,
   type ProtectedArea,
 } from "@/lib/auth/route-access";
 
@@ -42,7 +43,12 @@ export default function RoleGuard({ area, children }: RoleGuardProps) {
     }
 
     if (!isAuthenticated) {
-      router.replace(LOGIN_ROUTE);
+      const organizationCode = getStoredOrganizationCode();
+      const loginRoute = getLoginRoute(organizationCode);
+      if (pathname !== loginRoute) {
+        router.replace(loginRoute);
+      }
+
       return;
     }
 

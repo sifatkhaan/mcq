@@ -11,12 +11,15 @@ export interface User {
   name?: string;
   role?: UserRole | UserRole[];
   roles?: UserRole[];
+  organization_id?: number | null;
+  organization_code?: string | null;
 }
 
 export interface LoginResponse {
   accessToken: string;
   user: User;
 }
+
 export interface ProfileResponse {
   message: string;
   user: User;
