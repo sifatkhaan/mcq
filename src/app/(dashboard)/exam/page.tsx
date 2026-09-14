@@ -61,12 +61,10 @@ export default function ExamPage() {
     try {
       setActionId(id);
       setError("");
+      await publishExam(id);
 
-      const result = await publishExam(id);
-
-      setExams((current) =>
-        current.map((exam) => (exam.id === id ? result : exam)),
-      );
+      const updatedExams = await getExams();
+      setExams(updatedExams);
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Failed to publish exam",
@@ -85,11 +83,10 @@ export default function ExamPage() {
       setActionId(id);
       setError("");
 
-      const result = await closeExam(id);
+      await closeExam(id);
 
-      setExams((current) =>
-        current.map((exam) => (exam.id === id ? result : exam)),
-      );
+      const updatedExams = await getExams();
+      setExams(updatedExams);
     } catch (error) {
       setError(error instanceof Error ? error.message : "Failed to close exam");
     } finally {

@@ -29,6 +29,10 @@ import Button from "../../../../../../components/button/Button";
 import useDebounced from "@/hooks/debounceHook";
 import DeleteConfirm from "../../../../../../components/common/DeleteConfirm";
 
+function sortExamQuestions(questions: ExamQuestion[]) {
+  return questions.slice().sort((a, b) => a.question_order - b.question_order);
+}
+
 export default function ExamQuestionsPage() {
   const params = useParams();
 
@@ -159,9 +163,7 @@ export default function ExamQuestionsPage() {
 
         setExam(examResult);
 
-        const sortedQuestions = questionsResult
-          .slice()
-          .sort((a, b) => a.question_order - b.question_order);
+        const sortedQuestions = sortExamQuestions(questionsResult);
 
         setQuestions(sortedQuestions);
 
@@ -194,13 +196,10 @@ export default function ExamQuestionsPage() {
 
   useEffect(() => {
     let cancelled = false;
-
     async function loadSubjects() {
       try {
         setSubjectsLoading(true);
-
         const result = await getSubjects();
-
         if (!cancelled) {
           setSubjects(result);
         }
@@ -231,12 +230,6 @@ export default function ExamQuestionsPage() {
   useEffect(() => {
     let cancelled = false;
 
-    setChapterId(undefined);
-    setTopicId(undefined);
-
-    setChapters([]);
-    setTopics([]);
-
     if (!subjectId) {
       return;
     }
@@ -244,9 +237,7 @@ export default function ExamQuestionsPage() {
     async function loadChapters() {
       try {
         setChaptersLoading(true);
-
         const result = await getChapters(subjectId);
-
         if (!cancelled) {
           setChapters(result);
         }
@@ -277,10 +268,6 @@ export default function ExamQuestionsPage() {
   useEffect(() => {
     let cancelled = false;
 
-    setTopicId(undefined);
-
-    setTopics([]);
-
     if (!chapterId) {
       return;
     }
@@ -288,9 +275,7 @@ export default function ExamQuestionsPage() {
     async function loadTopics() {
       try {
         setTopicsLoading(true);
-
         const result = await getTopics(chapterId);
-
         if (!cancelled) {
           setTopics(result);
         }
@@ -373,9 +358,16 @@ export default function ExamQuestionsPage() {
   // =========================================================
 
   function handleSelectQuestion(question: Question) {
+    if (!question.version_id) {
+      setError("This question does not have an active version.");
+      return;
+    }
+
     if (addedVersionIds.has(question.version_id)) {
       return;
     }
+
+    setError("");
     setSelectedQuestionId(question.id);
     setSelectedVersionId(question.version_id);
   }
@@ -386,69 +378,52 @@ export default function ExamQuestionsPage() {
 
   async function handleAddQuestion(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     setError("");
-
     if (!selectedVersionId) {
       setError("Please select a question.");
-
       return;
     }
-
     const order = Number(questionOrder);
-
     const marksValue = Number(marks);
-
     const negativeMarksValue = Number(negativeMarks);
-
     if (!Number.isInteger(order) || order <= 0) {
       setError("Question order must be a positive integer.");
-
       return;
     }
 
     if (!Number.isFinite(marksValue) || marksValue <= 0) {
       setError("Marks must be greater than 0.");
-
       return;
     }
 
     if (!Number.isFinite(negativeMarksValue) || negativeMarksValue < 0) {
       setError("Negative marks cannot be negative.");
-
       return;
     }
 
     if (addedVersionIds.has(selectedVersionId)) {
       setError("This question version is already added to the exam.");
-
       return;
     }
 
     try {
       setSaving(true);
-
-      const result = await addExamQuestion(examId, {
+      await addExamQuestion(examId, {
         question_version_id: selectedVersionId,
-
         question_order: order,
-
         marks: marksValue,
-
         negative_marks: negativeMarksValue,
       });
 
-      setQuestions((current) =>
-        [...current, result].sort(
-          (a, b) => a.question_order - b.question_order,
-        ),
+      const updatedQuestions = sortExamQuestions(
+        await getExamQuestions(examId),
       );
 
+      setQuestions(updatedQuestions);
+
       setSelectedQuestionId(null);
-
       setSelectedVersionId(null);
-
-      setQuestionOrder(String(questions.length + 2));
+      setQuestionOrder(String(updatedQuestions.length + 1));
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Failed to add question.",
@@ -465,11 +440,8 @@ export default function ExamQuestionsPage() {
   async function handleDeleteQuestion(examQuestionId: number) {
     try {
       setDeletingId(examQuestionId);
-
       setError("");
-
       await deleteExamQuestion(examId, examQuestionId);
-
       setQuestions((current) => {
         const updated = current
           .filter((question) => question.exam_question_id !== examQuestionId)
@@ -497,12 +469,32 @@ export default function ExamQuestionsPage() {
 
   function handleClearFilters() {
     setSearch("");
-
     setSubjectId(undefined);
-
     setChapterId(undefined);
-
     setTopicId(undefined);
+    setChapters([]);
+    setTopics([]);
+    setChaptersLoading(false);
+    setTopicsLoading(false);
+  }
+
+  function handleSubjectFilterChange(value: string) {
+    setSubjectId(value ? Number(value) : undefined);
+    setChapterId(undefined);
+    setTopicId(undefined);
+    setChapters([]);
+    setTopics([]);
+    setError("");
+    setChaptersLoading(Boolean(value));
+    setTopicsLoading(false);
+  }
+
+  function handleChapterFilterChange(value: string) {
+    setChapterId(value ? Number(value) : undefined);
+    setTopicId(undefined);
+    setTopics([]);
+    setError("");
+    setTopicsLoading(Boolean(value));
   }
 
   // =========================================================
@@ -754,9 +746,7 @@ export default function ExamQuestionsPage() {
                 value={subjectId ?? ""}
                 disabled={subjectsLoading}
                 onChange={(event) => {
-                  const value = event.target.value;
-
-                  setSubjectId(value ? Number(value) : undefined);
+                  handleSubjectFilterChange(event.target.value);
                 }}
                 className="min-h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100"
               >
@@ -785,9 +775,7 @@ export default function ExamQuestionsPage() {
                 value={chapterId ?? ""}
                 disabled={!subjectId || chaptersLoading}
                 onChange={(event) => {
-                  const value = event.target.value;
-
-                  setChapterId(value ? Number(value) : undefined);
+                  handleChapterFilterChange(event.target.value);
                 }}
                 className="min-h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100"
               >
@@ -913,7 +901,9 @@ export default function ExamQuestionsPage() {
 
             <div className="max-h-[500px] space-y-2 overflow-y-auto rounded-xl border border-gray-200 p-2">
               {availableQuestions.map((question) => {
-                const alreadyAdded = addedVersionIds.has(question.version_id);
+                const alreadyAdded = question.version_id
+                  ? addedVersionIds.has(question.version_id)
+                  : false;
 
                 const selected = selectedQuestionId === question.id;
 
@@ -1102,13 +1092,6 @@ export default function ExamQuestionsPage() {
             loading={saving}
             loadingText="Adding..."
             disabled={!selectedVersionId}
-            onClick={() => {
-              const form = document.getElementById(
-                "add-exam-question-form",
-              ) as HTMLFormElement | null;
-
-              form?.requestSubmit();
-            }}
           >
             Add Question
           </Button>

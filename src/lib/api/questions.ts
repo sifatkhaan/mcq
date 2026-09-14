@@ -50,6 +50,13 @@ export interface CreateQuestionPayload {
   options: QuestionOption[];
 }
 
+type CreateQuestionResponse =
+  | Question
+  | {
+      data?: Question;
+      question?: Question;
+    };
+
 export interface UpdateQuestionPayload {
   subject_id: number;
   chapter_id: number;
@@ -133,10 +140,22 @@ export async function getQuestion(id: number) {
 // ==========================================
 
 export async function createQuestion(payload: CreateQuestionPayload) {
-  return authenticatedApiClient<Question>("/questions", {
+  const response = await authenticatedApiClient<CreateQuestionResponse>("/questions", {
     method: "POST",
     body: JSON.stringify(payload),
   });
+
+  if ("id" in response) {
+    return response;
+  }
+
+  const question = response.data ?? response.question;
+
+  if (!question?.id) {
+    throw new Error("Question created, but the response did not include an id.");
+  }
+
+  return question;
 }
 
 // ==========================================

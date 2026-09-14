@@ -13,9 +13,7 @@ import Button from "../../../../../components/button/Button";
 
 interface FormOption {
   option_order: number;
-
   option_text: string;
-
   is_correct: boolean;
 }
 

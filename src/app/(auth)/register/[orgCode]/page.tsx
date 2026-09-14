@@ -3,6 +3,7 @@ import { FormEvent, useState } from "react";
 import { register } from "@/lib/api/auth";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Button from "../../../../../components/button/Button";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -78,7 +79,6 @@ export default function RegisterPage() {
               >
                 Full Name
               </label>
-
               <input
                 id="name"
                 type="text"
@@ -230,20 +230,14 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="
-            w-full rounded-lg bg-black
-            px-4 py-3 text-sm font-medium
-            text-white transition
-            hover:bg-gray-800
-            disabled:cursor-not-allowed
-            disabled:opacity-50
-          "
+              loading={loading}
+              loadingText="Creating account..."
+              fullWidth
             >
-              {loading ? "Creating account..." : "Create Account"}
-            </button>
+              Create Account
+            </Button>
 
             <div className="pt-2 text-center">
               <p className="text-sm text-gray-500">

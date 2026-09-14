@@ -8,12 +8,13 @@ import Button from "../../../../../../components/button/Button";
 export default function ViewQuestionPage() {
   const params = useParams();
   const id = Number(params.id);
+  const invalidQuestionId = !Number.isFinite(id) || id <= 0;
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!id) {
+    if (invalidQuestionId) {
       return;
     }
 
@@ -47,7 +48,15 @@ export default function ViewQuestionPage() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, invalidQuestionId]);
+
+  if (invalidQuestionId) {
+    return (
+      <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600">
+        Invalid question id.
+      </div>
+    );
+  }
 
   if (loading) {
     return <div className="p-6 text-sm text-gray-500">Loading question...</div>;

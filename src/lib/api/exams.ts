@@ -169,7 +169,9 @@ export interface AvailableStudent {
 // ==========================================
 
 export async function getExams() {
-  return authenticatedApiClient<Exam[]>("/exams");
+  return authenticatedApiClient<Exam[]>("/exams", {
+    cache: "no-store",
+  });
 }
 
 // ==========================================
@@ -237,7 +239,12 @@ export async function deleteExam(id: number) {
 // GET EXAM QUESTIONS
 // ==========================================
 export async function getExamQuestions(examId: number) {
-  return authenticatedApiClient<ExamQuestion[]>(`/exams/${examId}/questions`);
+  return authenticatedApiClient<ExamQuestion[]>(
+    `/exams/${examId}/questions`,
+    {
+      cache: "no-store",
+    },
+  );
 }
 // ==========================================
 // ADD QUESTION TO EXAM
